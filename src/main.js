@@ -1,9 +1,10 @@
 import TelegramBot from "node-telegram-bot-api";
 
-import { goodbay } from "./functions/goodbay";
-import { welcome } from "./functions/welcome";
+import { BOT_TOKEN } from "./configs/variables.js";
+import { goodbay } from "./functions/goodbay.js";
+import { welcome } from "./functions/welcome.js";
 
-const token = "YOUR_TELEGRAM_BOT_TOKEN";
+const token = BOT_TOKEN;
 const bot = new TelegramBot(token, { polling: true });
 
 // Comprueba Actulizacion
