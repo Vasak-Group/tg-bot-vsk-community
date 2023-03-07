@@ -3,9 +3,11 @@
   "version": "0.0.1",
   "description": "Bot de Telegram para Vasak Community",
   "main": "src/main.js",
+  "type": "module",
   "author": "Vasak Group",
   "license": "MIT",
   "dependencies": {
+    "dotenv": "^16.0.3",
     "node-telegram-bot-api": "^0.61.0"
   }
 }
