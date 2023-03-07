@@ -1,0 +1,8 @@
+{
+  "name": "tg-bot-vsk-community",
+  "version": "0.0.1",
+  "description": "Bot de Telegram para Vasak Community",
+  "main": "src/main.js",
+  "author": "Vasak Group",
+  "license": "MIT"
+}
