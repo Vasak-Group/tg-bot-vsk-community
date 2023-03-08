@@ -59,3 +59,30 @@ bot.onText(/^\/ban (.+)/, function (msg, match) {
     }
   });
 });
+
+bot.onText(/^\/unban/, function (msg) {
+  var chatId = msg.chat.id;
+  var replyId = msg.reply_to_message.from.id;
+  var userId = msg.from.id;
+  var replyName = msg.reply_to_message.from.first_name;
+  var fromName = msg.from.first_name;
+  var messageId = msg.message_id;
+
+  if (msg.reply_to_message == undefined) {
+    return;
+  }
+
+  bot.getChatMember(chatId, userId).then(function (data) {
+    if (isAdmin(data.status)) {
+      bot.unbanChatMember(chatId, replyId).then(function (result) {
+        bot.deleteMessage(chatId, messageId);
+        bot.sendMessage(
+          chatId,
+          "El usuario " + replyName + " ha sido desbaneado"
+        );
+      });
+    } else {
+      permissionError(bot, chatId, fromName);
+    }
+  });
+});
