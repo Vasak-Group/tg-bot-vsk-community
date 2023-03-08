@@ -1,9 +1,10 @@
 import TelegramBot from "node-telegram-bot-api";
+import ms from "ms";
 
 import { BOT_TOKEN } from "./configs/variables.js";
 import { goodbay } from "./functions/goodbay.js";
 import { welcome } from "./functions/welcome.js";
-import { permissionError } from "./tools/ErrorManager.js";
+import { permissionError, executionError } from "./tools/ErrorManager.js";
 import { isAdmin } from "./tools/StatusCheker.js";
 
 const token = BOT_TOKEN;
@@ -23,7 +24,7 @@ bot.on("message", function (msg) {
   goodbay(bot, chatId, chatTitle, msg); // Se despide si salio alguien
 });
 
-bot.onText(/^\/ban (.+)/, function (msg, match) {
+bot.onText(/^\/ban (.+)/, async function (msg, match) {
   var chatId = msg.chat.id;
   var userId = msg.from.id;
   var replyId = msg.reply_to_message.from.id;
@@ -31,32 +32,31 @@ bot.onText(/^\/ban (.+)/, function (msg, match) {
   var fromName = msg.from.first_name;
   var messageId = msg.message_id;
   var text = match[1];
-  const ms = require("ms");
 
   if (msg.reply_to_message == undefined) {
     return;
   }
 
-  bot.getChatMember(chatId, userId).then(function (data) {
+  try {
+    const data = await bot.getChatMember(chatId, userId);
     if (isAdmin(data.status)) {
-      bot
-        .kickChatMember(chatId, replyId, {
-          until_date: Math.round((Date.now() + ms(text + " days")) / 1000),
-        })
-        .then(function (result) {
-          bot.deleteMessage(chatId, messageId);
-          bot.sendMessage(
-            chatId,
-            `El usuario ${replyName} ha sido baneado durante ${text} días.`
-          );
-        });
+      await bot.kickChatMember(chatId, replyId, {
+        until_date: Math.round((Date.now() + ms(text + " days")) / 1000),
+      });
+      bot.deleteMessage(chatId, messageId);
+      bot.sendMessage(
+        chatId,
+        `El usuario ${replyName} ha sido baneado durante ${text} días.`
+      );
     } else {
       permissionError(bot, chatId, fromName);
     }
-  });
+  } catch (err) {
+    executionError(bot, chatId, fromName);
+  }
 });
 
-bot.onText(/^\/unban/, function (msg) {
+bot.onText(/^\/unban/, async function (msg) {
   var chatId = msg.chat.id;
   var replyId = msg.reply_to_message.from.id;
   var userId = msg.from.id;
@@ -68,14 +68,16 @@ bot.onText(/^\/unban/, function (msg) {
     return;
   }
 
-  bot.getChatMember(chatId, userId).then(function (data) {
+  try {
+    const data = await bot.getChatMember(chatId, userId);
     if (isAdmin(data.status)) {
-      bot.unbanChatMember(chatId, replyId).then(function (result) {
-        bot.deleteMessage(chatId, messageId);
-        bot.sendMessage(chatId, `El usuario ${replyName} ha sido desbaneado`);
-      });
+      await bot.unbanChatMember(chatId, replyId);
+      bot.deleteMessage(chatId, messageId);
+      bot.sendMessage(chatId, `El usuario ${replyName} ha sido desbaneado`);
     } else {
       permissionError(bot, chatId, fromName);
     }
-  });
+  } catch (err) {
+    executionError(bot, chatId, fromName);
+  }
 });
