@@ -47,11 +47,7 @@ bot.onText(/^\/ban (.+)/, function (msg, match) {
           bot.deleteMessage(chatId, messageId);
           bot.sendMessage(
             chatId,
-            "El usuario " +
-              replyName +
-              " ha sido baneado durante " +
-              text +
-              " días."
+            `El usuario ${replyName} ha sido baneado durante ${text} días.`
           );
         });
     } else {
@@ -76,10 +72,7 @@ bot.onText(/^\/unban/, function (msg) {
     if (isAdmin(data.status)) {
       bot.unbanChatMember(chatId, replyId).then(function (result) {
         bot.deleteMessage(chatId, messageId);
-        bot.sendMessage(
-          chatId,
-          "El usuario " + replyName + " ha sido desbaneado"
-        );
+        bot.sendMessage(chatId, `El usuario ${replyName} ha sido desbaneado`);
       });
     } else {
       permissionError(bot, chatId, fromName);
